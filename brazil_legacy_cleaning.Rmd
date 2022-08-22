@@ -1,0 +1,72 @@
+---
+title: "brazil_legacy_cleaning"
+author: "Jake Eisaguirre"
+date: "2022-08-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+
+# librarian downloads, if not already downloaded, and reads in needed packages
+
+librarian::shelf(here, tidyverse, janitor, lubridate, parsedate, stringr,hms, stringi)
+```
+
+# load data and rename columns
+```{r}
+
+brazil <- read_csv(here("data", "brazil_bd.csv")) %>% 
+  clean_names() %>% 
+  rename(campaign = campanha,
+         date = data,
+         survey_time = dia_noite,
+         area_sample = area_amostral,
+         environment = ponto,
+         family = familia,
+         scientific_name = nome_cientifico,
+         time_of_capture = horario,
+         start_end = inicio_fim,
+         glycerol = glicerol,
+         tissue = tecido,
+         marked = marcado,
+         comments = observacoes)
+
+```
+
+# convert characters to english and fix lat/long
+```{r}
+
+brazil_english <- brazil %>% 
+  mutate(survey_time = ifelse(survey_time=="Dia", "day", "night"),
+         environment = ifelse(environment=="Terra", "land", "water"),
+         date = parse_date(date),
+         family = str_to_lower(family),
+         scientific_name = str_to_lower(scientific_name),
+         latitude = as.character(str_sub(latitude, end = 9)),
+         latitude = abs(as.numeric(latitude)),
+         latitude = (-1 *latitude),
+         longitude = as.character(str_sub(longitude, end = 9)),
+         longitude = abs(as.numeric(longitude)),
+         longitude = (-1 *longitude))
+
+```
+
+# split apart start_time column and add duration column
+```{r}
+
+b_start_end <- brazil_english %>% 
+  mutate(end_time = str_sub(start_end, -5),
+         start_time= str_sub(start_end, start = 1, end = -7)) %>% 
+  relocate(start_time, .before = time_of_capture) %>% 
+  relocate(end_time, .after = start_time) %>% 
+  select(!start_end) %>% 
+  mutate()
+
+```
+
