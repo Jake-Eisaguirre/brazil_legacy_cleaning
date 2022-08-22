@@ -18,7 +18,7 @@ if (!require(librarian)){
 librarian::shelf(here, tidyverse, janitor, lubridate, parsedate, stringr,hms, stringi)
 ```
 
-# load data and rename columns
+# load brazil data and rename columns
 ```{r}
 
 brazil <- read_csv(here("data", "brazil_bd.csv")) %>% 
@@ -26,7 +26,7 @@ brazil <- read_csv(here("data", "brazil_bd.csv")) %>%
   rename(campaign = campanha,
          date = data,
          survey_time = dia_noite,
-         area_sample = area_amostral,
+         area = area_amostral,
          environment = ponto,
          family = familia,
          scientific_name = nome_cientifico,
@@ -39,6 +39,19 @@ brazil <- read_csv(here("data", "brazil_bd.csv")) %>%
 
 ```
 
+# load campaign data
+```{r}
+
+camp <- read_csv(here("data", "brazil_sites.csv")) %>% 
+  mutate(latitude = as.character(str_sub(latitude, end = 9)),
+         longitude = as.character(str_sub(longitude, end = 9)),
+         latitude = -1 * as.numeric(latitude),
+         longitude = -1 * as.numeric(longitude),
+         area = paste("s", area, sep=""))
+  
+```
+
+
 # convert characters to english and fix lat/long
 ```{r}
 
@@ -48,6 +61,7 @@ brazil_english <- brazil %>%
          date = parse_date(date),
          family = str_to_lower(family),
          scientific_name = str_to_lower(scientific_name),
+         area = str_to_lower(area),
          latitude = as.character(str_sub(latitude, end = 9)),
          latitude = abs(as.numeric(latitude)),
          latitude = (-1 *latitude),
@@ -57,16 +71,64 @@ brazil_english <- brazil %>%
 
 ```
 
-# split apart start_time column and add duration column
+# split apart start_time column
 ```{r}
 
 b_start_end <- brazil_english %>% 
   mutate(end_time = str_sub(start_end, -5),
-         start_time= str_sub(start_end, start = 1, end = -7)) %>% 
+         start_time= str_sub(start_end, start = 1, end = -7),
+         count = as.numeric(1)) %>% 
   relocate(start_time, .before = time_of_capture) %>% 
-  relocate(end_time, .after = start_time) %>% 
-  select(!start_end) %>% 
-  mutate()
+  relocate(end_time, .after = start_time) %>%
+  relocate(count, .after = time_of_capture) %>% 
+  select(!start_end) %>%
+  mutate(end_time = str_replace(end_time, "/", "0"))
+  
+  
+
+```
+
+# convert columns to bool
+```{r}
+
+
+brazil_bool <- b_start_end %>% 
+  mutate(glycerol = if_else(glycerol == "x", "1", "0", missing = "0"),
+         tissue = if_else(tissue == "x", "1", "0", missing = "0"),
+         marked = if_else(marked == "x", "1", "0", missing = "0")) %>% 
+  rename(capture_latitude = latitude,
+         capture_longitude = longitude)
+
+
+```
+
+# fix end_time leading zero issue and add seconds zeros
+```{r}
+brazzzzzil<- data.frame(gsub("\\b(\\d{1})\\b", "0\\1", as.matrix(brazil_bool)))
+
+brazil_time_fix <- brazzzzzil %>% 
+  mutate(start_time = paste(start_time, ":00", sep = ""),
+         end_time = paste(end_time, ":00", sep = ""),
+         time_of_capture = paste(time_of_capture, ":00", sep = ""),
+         start_time = str_replace(start_time, "NA:00", "NA"),
+         end_time = str_replace(end_time, "NA:00", "NA"),
+         count = as.numeric(count))
+
+```
+
+# add duration column
+```{r}
+
+duration_brazil <- brazil_time_fix %>% 
+  mutate(start_hour = hour(start_time),
+         end_hour = hour(end_time),
+         duration_min = if_else(end_time < start_time,
+                            as_hms(86400) - start_time + end_time,
+                            end_time - start_time),
+         duration_min = duration_min/60)
+
+a <- brazil_time_fix %>% 
+  mutate(start_time = hour(start_time))
 
 ```
 
