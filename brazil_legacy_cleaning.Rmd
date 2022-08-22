@@ -112,7 +112,10 @@ brazil_time_fix <- brazzzzzil %>%
          time_of_capture = paste(time_of_capture, ":00", sep = ""),
          start_time = str_replace(start_time, "NA:00", "NA"),
          end_time = str_replace(end_time, "NA:00", "NA"),
-         count = as.numeric(count))
+         count = as.numeric(count),
+         glycerol = as.numeric(glycerol),
+         tissue = as.numeric(tissue),
+         marked = as.numeric(tissue))
 
 ```
 
@@ -120,7 +123,7 @@ brazil_time_fix <- brazzzzzil %>%
 ```{r}
 
 duration_brazil <- brazil_time_fix %>% 
-  mutate(start_hour = hour(start_time),
+  mutate(start_hour = as_hms(start_time),
          end_hour = hour(end_time),
          duration_min = if_else(end_time < start_time,
                             as_hms(86400) - start_time + end_time,
@@ -128,7 +131,7 @@ duration_brazil <- brazil_time_fix %>%
          duration_min = duration_min/60)
 
 a <- brazil_time_fix %>% 
-  mutate(start_time = hour(start_time))
+  mutate(start_time = as_hms(start_time))
 
 ```
 
