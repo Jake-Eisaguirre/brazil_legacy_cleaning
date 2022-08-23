@@ -49,6 +49,8 @@ camp <- read_csv(here("data", "brazil_sites.csv")) %>%
          latitude = -1 * as.numeric(latitude),
          longitude = -1 * as.numeric(longitude),
          area = paste("s", area, sep=""))
+
+write_csv(camp, here("clean_tables", "campaign_location.csv"))
   
 ```
 
@@ -206,7 +208,10 @@ write_csv(survey_table, here("clean_tables", "survey.csv"))
 ```{r}
 
 capture_table <- brazil_time_fix %>% 
-  select(!c(campaign, area, location, start_time, end_time))
+  select(!c(location, start_time, end_time)) %>% 
+  mutate(glycerol = as.logical(glycerol),
+         tissue = as.logical(tissue),
+         marked = as.logical(marked))
 
 write_csv(capture_table, here("clean_tables", "capture.csv"))
 
