@@ -31,6 +31,7 @@ brazil <- read_csv(here("data", "brazil_bd.csv")) %>%
          family = familia,
          scientific_name = nome_cientifico,
          time_of_capture = horario,
+         swab_id = swab,
          start_end = inicio_fim,
          glycerol = glicerol,
          tissue = tecido,
@@ -115,12 +116,27 @@ brazil_time_fix <- brazzzzzil %>%
          count = as.numeric(count),
          glycerol = as.numeric(glycerol),
          tissue = as.numeric(tissue),
-         marked = as.numeric(tissue))
+         marked = as.numeric(tissue),
+         location = "brazil",
+         date = parse_date(date))
 
 ```
 
-# add duration column
+# fix mis-inputted end_time
 ```{r}
+
+b <- brazil_time_fix %>% 
+  select(c(start_time, end_time, time_of_capture)) %>% 
+  mutate(start_time = sort(start_time))
+
+row_sap <- brazil_time_fix %>%
+  mutate(mint = pmax(time_of_capture, end_time),
+         end_time = pmax(start_time, end_time),
+         start_time = mint, mint = NULL)
+
+brazil_time_fix <- left_join(brazil_time_fix, row_sap, by = "swab")
+
+
 
 duration_brazil <- brazil_time_fix %>% 
   mutate(start_hour = as_hms(start_time),
@@ -132,6 +148,67 @@ duration_brazil <- brazil_time_fix %>%
 
 a <- brazil_time_fix %>% 
   mutate(start_time = as_hms(start_time))
+
+```
+
+# location table
+```{r}
+location_table <- brazil_time_fix %>% 
+  select(location) %>% 
+  group_by(location) %>% 
+  mutate(loc_temp_id = cur_group_id()) %>% 
+  filter(!duplicated(loc_temp_id))
+
+write_csv(location_table, here("clean_tables", "location.csv"))
+```
+
+
+# create campaign table
+```{r}
+
+campaign_table <- brazil_time_fix %>% 
+  select(campaign, location) %>% 
+  group_by(campaign) %>% 
+  mutate(camp_temp_id = cur_group_id()) %>% 
+  filter(!duplicated(site_temp_id))
+
+write_csv(campaign_table, here("clean_tables", "campaign.csv"))
+
+```
+
+# create visit table
+```{r}
+
+visit_table <- brazil_time_fix %>% 
+  select(campaign, date, area, survey_time, environment) %>% 
+  group_by(date, survey_time) %>% 
+  mutate(v_temp_id = cur_group_id()) %>% 
+  filter(!duplicated(v_temp_id))
+
+write_csv(visit_table, here("clean_tables", "visit.csv"))
+
+```
+
+# create bad survey table but following structure
+```{r}
+
+survey_table <- brazil_time_fix %>% 
+  select(start_time, end_time, environment, date, survey_time, area, campaign) %>% 
+  group_by(date, area, survey_time, environment) %>% 
+  mutate(temp_surv_id = cur_group_id()) %>% 
+  filter(!duplicated(temp_surv_id))
+
+write_csv(survey_table, here("clean_tables", "survey.csv"))
+
+```
+
+# capture table
+```{r}
+
+capture_table <- brazil_time_fix %>% 
+  select(!c(campaign, area, location, start_time, end_time))
+
+write_csv(capture_table, here("clean_tables", "capture.csv"))
 
 ```
 
