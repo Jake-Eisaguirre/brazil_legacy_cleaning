@@ -187,7 +187,7 @@ write_csv(campaign_table, here("clean_tables", "campaign.csv"))
 ```{r}
 
 site_table <- brazil_time_fix %>% 
-  select(campaign, location, date, area, environment, survey_time, longitude_start, 
+  select(campaign, location, area, environment, longitude_start, 
          longitude_end, latitude_start, latitude_end) %>% 
   group_by(area, environment) %>% 
   mutate(site_temp_id = cur_group_id()) %>% 
@@ -203,7 +203,7 @@ write_csv(site_table, here("clean_tables", "site.csv"))
 
 visit_table <- brazil_time_fix %>% 
   select(campaign, date, area, survey_time, environment) %>% 
-  group_by(date, survey_time) %>% 
+  group_by(date, survey_time, area) %>% 
   mutate(v_temp_id = cur_group_id()) %>% 
   filter(!duplicated(v_temp_id))
 
