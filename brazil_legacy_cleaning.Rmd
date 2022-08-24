@@ -36,7 +36,8 @@ brazil <- read_csv(here("data", "brazil_bd.csv")) %>%
          glycerol = glicerol,
          tissue = tecido,
          marked = marcado,
-         comments = observacoes)
+         comments = observacoes) %>% 
+  mutate(area = str_replace(area, "S", ""))
 
 ```
 
@@ -48,7 +49,9 @@ camp <- read_csv(here("data", "brazil_sites.csv")) %>%
          longitude = as.character(str_sub(longitude, end = 9)),
          latitude = -1 * as.numeric(latitude),
          longitude = -1 * as.numeric(longitude),
-         area = paste("s", area, sep=""))
+         area = str_to_lower(area)) %>% 
+  pivot_wider(names_from = start_end, values_from = c(latitude, longitude))
+  
 
 write_csv(camp, here("clean_tables", "campaign_location.csv"))
   
@@ -120,36 +123,38 @@ brazil_time_fix <- brazzzzzil %>%
          tissue = as.numeric(tissue),
          marked = as.numeric(tissue),
          location = "brazil",
-         date = parse_date(date))
+         date = parse_date(date),
+         area = str_replace(area, "0", "")) %>% 
+  left_join(camp, by = c("area", "environment"))
 
 ```
 
 # fix mis-inputted end_time
 ```{r}
 
-b <- brazil_time_fix %>% 
-  select(c(start_time, end_time, time_of_capture)) %>% 
-  mutate(start_time = sort(start_time))
-
-row_sap <- brazil_time_fix %>%
-  mutate(mint = pmax(time_of_capture, end_time),
-         end_time = pmax(start_time, end_time),
-         start_time = mint, mint = NULL)
-
-brazil_time_fix <- left_join(brazil_time_fix, row_sap, by = "swab")
-
-
-
-duration_brazil <- brazil_time_fix %>% 
-  mutate(start_hour = as_hms(start_time),
-         end_hour = hour(end_time),
-         duration_min = if_else(end_time < start_time,
-                            as_hms(86400) - start_time + end_time,
-                            end_time - start_time),
-         duration_min = duration_min/60)
-
-a <- brazil_time_fix %>% 
-  mutate(start_time = as_hms(start_time))
+# b <- brazil_time_fix %>% 
+#   select(c(start_time, end_time, time_of_capture)) %>% 
+#   mutate(start_time = sort(start_time))
+# 
+# row_sap <- brazil_time_fix %>%
+#   mutate(mint = pmax(time_of_capture, end_time),
+#          end_time = pmax(start_time, end_time),
+#          start_time = mint, mint = NULL)
+# 
+# brazil_time_fix <- left_join(brazil_time_fix, row_sap, by = "swab")
+# 
+# 
+# 
+# duration_brazil <- brazil_time_fix %>% 
+#   mutate(start_hour = as_hms(start_time),
+#          end_hour = hour(end_time),
+#          duration_min = if_else(end_time < start_time,
+#                             as_hms(86400) - start_time + end_time,
+#                             end_time - start_time),
+#          duration_min = duration_min/60)
+# 
+# a <- brazil_time_fix %>% 
+#   mutate(start_time = as_hms(start_time))
 
 ```
 
@@ -172,11 +177,26 @@ campaign_table <- brazil_time_fix %>%
   select(campaign, location) %>% 
   group_by(campaign) %>% 
   mutate(camp_temp_id = cur_group_id()) %>% 
-  filter(!duplicated(site_temp_id))
+  filter(!duplicated(camp_temp_id))
 
 write_csv(campaign_table, here("clean_tables", "campaign.csv"))
 
 ```
+
+# create site table
+```{r}
+
+site_table <- brazil_time_fix %>% 
+  select(campaign, location, date, area, environment, survey_time, longitude_start, 
+         longitude_end, latitude_start, latitude_end) %>% 
+  group_by(area, environment) %>% 
+  mutate(site_temp_id = cur_group_id()) %>% 
+  filter(!duplicated(site_temp_id))
+
+write_csv(site_table, here("clean_tables", "site.csv"))
+
+```
+
 
 # create visit table
 ```{r}

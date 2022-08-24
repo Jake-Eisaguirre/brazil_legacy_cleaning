@@ -1,0 +1,27 @@
+campaign,location,date,area,environment,survey_time,longitude_start,longitude_end,latitude_start,latitude_end,site_temp_id
+02,brazil,2021-02-16T00:00:00Z,5,land,night,-45.097041,-45.097149,-23.331908,-23.332423,11
+02,brazil,2021-10-02T00:00:00Z,2,land,night,-45.144043,-45.144868,-23.343771,-23.343202,5
+02,brazil,2021-11-02T00:00:00Z,1,land,night,-45.150486,-45.149853,-23.340744,-23.340144,2
+05,brazil,2021-09-14T00:00:00Z,1,water,day,-45.149414,-45.150415,-23.340813,-23.340957,3
+04,brazil,2021-03-08T00:00:00Z,6,water,night,-45.089126,-45.089635,-23.324259,-23.323796,14
+07,brazil,2022-02-14T00:00:00Z,4,land,night,-45.117835,-45.11807,-23.341032,-23.341658,9
+01,brazil,2020-08-12T00:00:00Z,6,land,day,-45.094422,-45.093824,-23.324572,-23.325524,13
+01,brazil,2020-12-14T00:00:00Z,lago  angelim,water,night,NA,NA,NA,NA,21
+05,brazil,2019-01-20T00:00:00Z,5,water,night,-45.099698,-45.100173,-23.332042,-23.33294,12
+05,brazil,2021-09-17T00:00:00Z,4,water,night,-45.117734,-45.117084,-23.340738,-23.341416,10
+07,brazil,2022-02-15T00:00:00Z,3,water,night,-45.129222,-45.129122,-23.343694,-23.344569,8
+06,brazil,2021-12-04T00:00:00Z,8,water,day,-45.120015,-45.120332,-23.313991,-23.313219,18
+06,brazil,2021-12-04T00:00:00Z,8,land,night,-45.124575,-45.12563,-23.31427,-23.314665,17
+05,brazil,2021-09-18T00:00:00Z,3,land,night,-45.128388,-45.127484,-23.343741,-23.343472,7
+-,brazil,NA,-,water,night,NA,NA,NA,NA,1
+05,brazil,2021-09-22T00:00:00Z,7,land,night,-45.132481,-45.13151,-23.326528,-23.326772,15
+08,brazil,2022-05-12T00:00:00Z,7,water,night,-45.133222,-45.132601,-23.327646,-23.328478,16
+01,brazil,2020-12-15T00:00:00Z,lago minutal,water,night,NA,NA,NA,NA,23
+07,brazil,2022-02-19T00:00:00Z,lago sede,water,night,NA,NA,NA,NA,24
+05,brazil,2021-09-15T00:00:00Z,2,water,night,-45.144503,-45.143634,-23.342987,-23.343456,6
+01,brazil,2020-12-13T00:00:00Z,poça temporária,water,night,NA,NA,NA,NA,25
+01,brazil,2020-12-13T00:00:00Z,trilha,land,day,NA,NA,NA,NA,26
+09,brazil,2022-07-26T00:00:00Z,lago anta,water,night,NA,NA,NA,NA,22
+07,brazil,2022-02-22T00:00:00Z,9,water,night,NA,NA,NA,NA,20
+01,brazil,2020-12-12T00:00:00Z,11,water,night,NA,NA,NA,NA,4
+05,brazil,2021-09-23T00:00:00Z,9,land,night,NA,NA,NA,NA,19

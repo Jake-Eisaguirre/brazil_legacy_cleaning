@@ -1,41 +1,35 @@
-area,environment,start_end,latitude,longitude
-s1,water,start,-23.340813,-45.149414
-s1,water,end,-23.340957,-45.150415
-s2,water,start,-23.342987,-45.144503
-s2,water,end,-23.343456,-45.143634
-s3,water,start,-23.343694,-45.129222
-s3,water,end,-23.344569,-45.129122
-s4,water,start,-23.340738,-45.117734
-s4,water,end,-23.341416,-45.117084
-s5,water,start,-23.332042,-45.099698
-s5,water,end,-23.33294,-45.100173
-s6,water,start,-23.324259,-45.089126
-s6,water,end,-23.323796,-45.089635
-s7,water,start,-23.327646,-45.133222
-s7,water,end,-23.328478,-45.132601
-s8,water,start,-23.313991,-45.120015
-s8,water,end,-23.313219,-45.120332
-s9,water,start,NA,NA
-s9,water,end,NA,NA
-s10,water,start,-23.386967,-45.187918
-s10,water,end,-23.387121,-45.188828
-s1,land,start,-23.340744,-45.150486
-s1,land,end,-23.340144,-45.149853
-s2,land,start,-23.343771,-45.144043
-s2,land,end,-23.343202,-45.144868
-s3,land,start,-23.343741,-45.128388
-s3,land,end,-23.343472,-45.127484
-s4,land,start,-23.341032,-45.117835
-s4,land,end,-23.341658,-45.11807
-s5,land,start,-23.331908,-45.097041
-s5,land,end,-23.332423,-45.097149
-s6,land,start,-23.324572,-45.094422
-s6,land,end,-23.325524,-45.093824
-s7,land,start,-23.326528,-45.132481
-s7,land,end,-23.326772,-45.13151
-s8,land,start,-23.31427,-45.124575
-s8,land,end,-23.314665,-45.12563
-s9,land,start,NA,NA
-s9,land,end,NA,NA
-s10,water,start,-23.387007,-45.186547
-s10,water,end,-23.38801,-45.186227
+area,environment,latitude_start,latitude_end,longitude_start,longitude_end
+1,water,-23.340813,-23.340957,-45.149414,-45.150415
+2,water,-23.342987,-23.343456,-45.144503,-45.143634
+3,water,-23.343694,-23.344569,-45.129222,-45.129122
+4,water,-23.340738,-23.341416,-45.117734,-45.117084
+5,water,-23.332042,-23.33294,-45.099698,-45.100173
+6,water,-23.324259,-23.323796,-45.089126,-45.089635
+7,water,-23.327646,-23.328478,-45.133222,-45.132601
+8,water,-23.313991,-23.313219,-45.120015,-45.120332
+9,water,NA,NA,NA,NA
+10,water,-23.386967,-23.387121,-45.187918,-45.188828
+11,water,NA,NA,NA,NA
+lago angelim,water,NA,NA,NA,NA
+lago anta,water,NA,NA,NA,NA
+lago minutal,water,NA,NA,NA,NA
+lago sede,water,NA,NA,NA,NA
+poça temporária,water,NA,NA,NA,NA
+trilha,water,NA,NA,NA,NA
+1,land,-23.340744,-23.340144,-45.150486,-45.149853
+2,land,-23.343771,-23.343202,-45.144043,-45.144868
+3,land,-23.343741,-23.343472,-45.128388,-45.127484
+4,land,-23.341032,-23.341658,-45.117835,-45.11807
+5,land,-23.331908,-23.332423,-45.097041,-45.097149
+6,land,-23.324572,-23.325524,-45.094422,-45.093824
+7,land,-23.326528,-23.326772,-45.132481,-45.13151
+8,land,-23.31427,-23.314665,-45.124575,-45.12563
+9,land,NA,NA,NA,NA
+10,land,-23.387007,-23.38801,-45.186547,-45.186227
+11,land,NA,NA,NA,NA
+lago angelim,land,NA,NA,NA,NA
+lago anta,land,NA,NA,NA,NA
+lago minutal,land,NA,NA,NA,NA
+lago sede,land,NA,NA,NA,NA
+poça temporária,land,NA,NA,NA,NA
+trilha,land,NA,NA,NA,NA
