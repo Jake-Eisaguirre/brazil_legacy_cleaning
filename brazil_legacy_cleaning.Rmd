@@ -15,7 +15,7 @@ if (!require(librarian)){
 
 # librarian downloads, if not already downloaded, and reads in needed packages
 
-librarian::shelf(here, tidyverse, janitor, lubridate, parsedate, stringr,hms, stringi)
+librarian::shelf(here, tidyverse, janitor, lubridate, parsedate, stringr,hms, stringi, readr)
 ```
 
 # load brazil data and rename columns
@@ -57,6 +57,50 @@ write_csv(camp, here("clean_tables", "campaign_location.csv"))
   
 ```
 
+# clean dates per campaign. Different date formats.... lame
+```{r}
+
+camp_1 <- brazil %>% 
+  filter(campaign == "1") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+
+camp_2 <- brazil %>% 
+  filter(campaign == "2") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+
+camp_3 <- brazil %>% 
+  filter(campaign == "3") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+
+camp_4 <- brazil %>% 
+  filter(campaign == "4") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) 
+
+camp_5 <- brazil %>% 
+  filter(campaign == "5") %>% 
+  mutate(date = str_replace(date, "/19/", "/9/"),
+    date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+
+camp_6 <- brazil %>% 
+  filter(campaign == "6") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) 
+
+camp_7 <- brazil %>% 
+  filter(campaign == "7") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+
+camp_8 <- brazil %>% 
+  filter(campaign == "8") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+
+camp_9 <- brazil %>% 
+  filter(campaign == "9") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+
+brazil <- rbind(camp_1, camp_2, camp_3, camp_4, camp_5, camp_6, camp_7, camp_8, camp_9)
+  
+```
+
 
 # convert characters to english and fix lat/long
 ```{r}
@@ -64,7 +108,6 @@ write_csv(camp, here("clean_tables", "campaign_location.csv"))
 brazil_english <- brazil %>% 
   mutate(survey_time = ifelse(survey_time=="Dia", "day", "night"),
          environment = ifelse(environment=="Terra", "land", "water"),
-         date = parse_date(date),
          family = str_to_lower(family),
          scientific_name = str_to_lower(scientific_name),
          area = str_to_lower(area),
@@ -203,9 +246,12 @@ write_csv(site_table, here("clean_tables", "site.csv"))
 
 visit_table <- brazil_time_fix %>% 
   select(campaign, date, area, survey_time, environment) %>% 
-  group_by(date, survey_time, area) %>% 
+  unite(site, c(area, environment), sep="_") %>% 
+  group_by(date, survey_time, site) %>% 
   mutate(v_temp_id = cur_group_id()) %>% 
-  filter(!duplicated(v_temp_id))
+  filter(!duplicated(v_temp_id)) %>% 
+  mutate(site = str_replace(site, " ", "_")) %>% 
+  select(!c(v_temp_id))
 
 write_csv(visit_table, here("clean_tables", "visit.csv"))
 
@@ -216,9 +262,12 @@ write_csv(visit_table, here("clean_tables", "visit.csv"))
 
 survey_table <- brazil_time_fix %>% 
   select(start_time, end_time, environment, date, survey_time, area, campaign) %>% 
-  group_by(date, area, survey_time, environment) %>% 
+  unite(site, c(area, environment), sep="_")  %>%
+  group_by(date, site, survey_time) %>% 
   mutate(temp_surv_id = cur_group_id()) %>% 
-  filter(!duplicated(temp_surv_id))
+  filter(!duplicated(temp_surv_id)) %>% 
+  mutate(site = str_replace(site, " ", "_")) %>% 
+  select(!c(temp_surv_id))
 
 write_csv(survey_table, here("clean_tables", "survey.csv"))
 
