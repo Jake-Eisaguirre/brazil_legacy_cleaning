@@ -23,20 +23,12 @@ librarian::shelf(here, tidyverse, janitor, lubridate, parsedate, stringr,hms, st
 
 brazil <- read_csv(here("data", "brazil_bd.csv")) %>% 
   clean_names() %>% 
-  rename(campaign = campanha,
-         date = data,
-         survey_time = dia_noite,
-         area = area_amostral,
-         environment = ponto,
-         family = familia,
-         scientific_name = nome_cientifico,
-         time_of_capture = horario,
+  rename(date = date_formatted,
+         survey_time = day_night,
+         area = transect_id,
+         environment = stream_distance,
          swab_id = swab,
-         start_end = inicio_fim,
-         glycerol = glicerol,
-         tissue = tecido,
-         marked = marcado,
-         comments = observacoes) %>% 
+         comments = observations_portuguese) %>% 
   mutate(area = str_replace(area, "S", ""))
 
 ```
@@ -62,42 +54,62 @@ write_csv(camp, here("clean_tables", "campaign_location.csv"))
 
 camp_1 <- brazil %>% 
   filter(campaign == "1") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) %>% 
+  select(!date_unformatted)
 
 camp_2 <- brazil %>% 
   filter(campaign == "2") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
 camp_3 <- brazil %>% 
   filter(campaign == "3") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
 camp_4 <- brazil %>% 
   filter(campaign == "4") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) %>% 
+  select(!date_unformatted)
 
 camp_5 <- brazil %>% 
   filter(campaign == "5") %>% 
   mutate(date = str_replace(date, "/19/", "/9/"),
-    date = lubridate::parse_date_time(date, c("%d/%m/%y")))
+    date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
 camp_6 <- brazil %>% 
   filter(campaign == "6") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y"))) %>% 
+  select(!date_unformatted)
 
 camp_7 <- brazil %>% 
   filter(campaign == "7") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
 camp_8 <- brazil %>% 
   filter(campaign == "8") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
 camp_9 <- brazil %>% 
   filter(campaign == "9") %>% 
-  mutate(date = lubridate::parse_date_time(date, c("%m/%d/%y")))
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
 
-brazil <- rbind(camp_1, camp_2, camp_3, camp_4, camp_5, camp_6, camp_7, camp_8, camp_9)
+camp_10 <- brazil %>% 
+  filter(campaign == "10") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
+
+camp_11 <- brazil %>% 
+  filter(campaign == "11") %>% 
+  mutate(date = lubridate::parse_date_time(date, c("%d/%m/%y")))%>% 
+  select(!date_unformatted)
+
+
+brazil <- rbind(camp_1, camp_2, camp_3, camp_4, camp_5, camp_6, camp_7, camp_8, camp_9, camp_10, camp_11)
   
 ```
 
@@ -106,10 +118,10 @@ brazil <- rbind(camp_1, camp_2, camp_3, camp_4, camp_5, camp_6, camp_7, camp_8, 
 ```{r}
 
 brazil_english <- brazil %>% 
-  mutate(survey_time = ifelse(survey_time=="Dia", "day", "night"),
-         environment = ifelse(environment=="Terra", "land", "water"),
+  mutate(survey_time = str_to_lower(survey_time),
+         environment = str_to_lower(environment),
          family = str_to_lower(family),
-         scientific_name = str_to_lower(scientific_name),
+         species = str_to_lower(species),
          area = str_to_lower(area),
          latitude = as.character(str_sub(latitude, end = 9)),
          latitude = abs(as.numeric(latitude)),
@@ -124,13 +136,13 @@ brazil_english <- brazil %>%
 ```{r}
 
 b_start_end <- brazil_english %>% 
-  mutate(end_time = str_sub(start_end, -5),
-         start_time= str_sub(start_end, start = 1, end = -7),
+  mutate(end_time = str_sub(time_beginning_end, -5),
+         start_time= str_sub(time_beginning_end, start = 1, end = -7),
          count = as.numeric(1)) %>% 
-  relocate(start_time, .before = time_of_capture) %>% 
+  relocate(start_time, .before = capture_time) %>% 
   relocate(end_time, .after = start_time) %>%
-  relocate(count, .after = time_of_capture) %>% 
-  select(!start_end) %>%
+  relocate(count, .after = capture_time) %>% 
+  select(!time_beginning_end) %>%
   mutate(end_time = str_replace(end_time, "/", "0"))
   
   
@@ -142,9 +154,9 @@ b_start_end <- brazil_english %>%
 
 
 brazil_bool <- b_start_end %>% 
-  mutate(glycerol = if_else(glycerol == "x", "1", "0", missing = "0"),
-         tissue = if_else(tissue == "x", "1", "0", missing = "0"),
-         marked = if_else(marked == "x", "1", "0", missing = "0")) %>% 
+  mutate(glycerol_swab_sample = if_else(glycerol_swab_sample == "x", "1", "0", missing = "0"),
+         tissue_sample = if_else(tissue_sample == "x", "1", "0", missing = "0"),
+         marked_toeclip = if_else(marked_toeclip == "x", "1", "0", missing = "0")) %>% 
   rename(capture_latitude = latitude,
          capture_longitude = longitude)
 
@@ -156,19 +168,26 @@ brazil_bool <- b_start_end %>%
 brazzzzzil<- data.frame(gsub("\\b(\\d{1})\\b", "0\\1", as.matrix(brazil_bool)))
 
 brazil_time_fix <- brazzzzzil %>% 
-  mutate(start_time = paste(start_time, ":00", sep = ""),
+  mutate(start_time = if_else(start_time == "", NA, start_time),
+         start_time = paste(start_time, ":00", sep = ""),
          end_time = paste(end_time, ":00", sep = ""),
-         time_of_capture = paste(time_of_capture, ":00", sep = ""),
+         #capture_time = paste(capture_time, ":00", sep = ""),
          start_time = str_replace(start_time, "NA:00", "NA"),
          end_time = str_replace(end_time, "NA:00", "NA"),
          count = as.numeric(count),
-         glycerol = as.numeric(glycerol),
-         tissue = as.numeric(tissue),
-         marked = as.numeric(tissue),
+         glycerol_swab_sample = as.numeric(glycerol_swab_sample),
+         tissue_sample = as.numeric(tissue_sample),
+         marked_toeclip = as.numeric(marked_toeclip),
          location = "brazil",
          date = parse_date(date),
-         area = str_replace(area, "0", "")) %>% 
-  left_join(camp, by = c("area", "environment"))
+         area = str_replace(area, "0", ""),
+         campaign = as.numeric(campaign)) %>% 
+  left_join(camp, by = c("area", "environment")) %>% 
+  rename(glycerol = glycerol_swab_sample,
+         tissue = tissue_sample,
+         marked = marked_toeclip,
+         scientific_name = species,
+         time_of_capture = capture_time)
 
 ```
 
@@ -230,11 +249,12 @@ write_csv(campaign_table, here("clean_tables", "campaign.csv"))
 ```{r}
 
 site_table <- brazil_time_fix %>% 
-  select(campaign, location, area, environment, longitude_start, 
+  select(area, environment, longitude_start, 
          longitude_end, latitude_start, latitude_end) %>% 
   group_by(area, environment) %>% 
   mutate(site_temp_id = cur_group_id()) %>% 
-  filter(!duplicated(site_temp_id))
+  filter(!duplicated(site_temp_id)) %>% 
+  select(!c(site_temp_id))
 
 write_csv(site_table, here("clean_tables", "site.csv"))
 
@@ -266,7 +286,9 @@ survey_table <- brazil_time_fix %>%
   group_by(date, site, survey_time) %>% 
   mutate(temp_surv_id = cur_group_id()) %>% 
   filter(!duplicated(temp_surv_id)) %>% 
-  mutate(site = str_replace(site, " ", "_")) %>% 
+  mutate(site = str_replace(site, " ", "_"),
+         start_time = if_else(start_time == "NA", NA, start_time),
+         end_time = if_else(start_time == "NA", NA, end_time)) %>% 
   select(!c(temp_surv_id))
 
 write_csv(survey_table, here("clean_tables", "survey.csv"))
@@ -280,9 +302,25 @@ capture_table <- brazil_time_fix %>%
   select(!c(location, start_time, end_time)) %>% 
   mutate(glycerol = as.logical(glycerol),
          tissue = as.logical(tissue),
-         marked = as.logical(marked))
+         marked = as.logical(marked),
+         sex = if_else(sex %in% c("FO", "F"), "female", "male")) %>% 
+  select(!c(dead, c(bd_presence:log10_1)))
 
 write_csv(capture_table, here("clean_tables", "capture.csv"))
+
+```
+
+# pull out new bd and CMR data
+```{r}
+
+cmr <- capture_table %>% 
+  select(swab_id, sex, recapture_from_campaign_n_number) %>% 
+  rename(capture_mark_recapture = recapture_from_campaign_n_number) %>% 
+  write_csv(here("clean_tables", "cmr.csv"))
+
+# bd <- capture_table %>% 
+#   select(swab_id, zoo_load_100, log10_1) %>% 
+#   write_csv(here("clean_tables", "bd.csv"))
 
 ```
 
